@@ -32,7 +32,7 @@ public:
     bool find(T element);       // Finds an element
     size_t size();              // Returns number of elements
 
-    void Splay(T element, Node *node) const;
+    void splay(T element, Node *node) const;
 };
 
 /**
@@ -150,8 +150,8 @@ size_t SplayTree<T>::size() {
  */
 
 template <typename T>
-void SplayTree<T>::splay(T element, Node *node) {
-    Node *leftMaxTree, *rightTreeMin;
+void SplayTree<T>::splay(T element, Node *node) const {
+    Node *leftTreeMax, *rightTreeMin;
     static Node header;
 
     header.leftChild = header.rightChild = nullptr;
@@ -164,7 +164,7 @@ void SplayTree<T>::splay(T element, Node *node) {
 
     for( ; ; ) {
         if (element < node->value) {
-            if (x < node->leftChild->value) {
+            if (element < node->leftChild->value) {
                 //rotateWithLeftChild(node);
             }
             if (node->leftChild == nullptr) {
@@ -173,19 +173,23 @@ void SplayTree<T>::splay(T element, Node *node) {
             rightTreeMin->leftChild = node;
             rightTreeMin = node;
             node = node->leftChild;
-        }
-    } else if (node->value < element) {
-        if (node->rightChild->value < element) {
-            // rotateWithRightChild(node);
-        }
-        if (node->rigthChild == nullptr) {
+        } else if (node->value < element) {
+            if (node->rightChild->value < element) {
+                // rotateWithRightChild(node);
+            }
+            if (node->rigthChild == nullptr) {
+                break;
+            }
+            leftTreeMax->rightChild = node;
+            leftTreeMax = node;
+            node = node->rightChild;
+        } else {
             break;
         }
-        leftTreeMax->rightChild = node;
-        rightTreeMax = node;
-        node = node->rightChild;
-    } else {
-        break;
+
+        leftTreeMax->rightChild = node->leftChild;
+        rightTreeMin->leftChild = node->rightChild;
+        node->rightChild = header.left;
     }
 }
 
