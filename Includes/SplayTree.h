@@ -174,6 +174,18 @@ void SplayTree<T>::splay(T element, Node *node) {
             rightTreeMin = node;
             node = node->leftChild;
         }
+    } else if (node->value < element) {
+        if (node->rightChild->value < element) {
+            // rotateWithRightChild(node);
+        }
+        if (node->rigthChild == nullptr) {
+            break;
+        }
+        leftTreeMax->rightChild = node;
+        rightTreeMax = node;
+        node = node->rightChild;
+    } else {
+        break;
     }
 }
 
