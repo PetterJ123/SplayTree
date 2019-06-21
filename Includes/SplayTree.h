@@ -6,6 +6,9 @@
 template <class T>
 class SplayTree {
 private:
+    /** Node class representing each node containing a reference to left and right children  and also a value that the node holds onto
+     */
+    
     class Node {
     public:
         T value;
@@ -24,15 +27,16 @@ private:
 
 public:
     SplayTree();
-    void insert(T element);
-    void remove(T element);
-    bool find(T element);
-    size_t size();
+    void insert(T element);     // Inserts an element
+    void remove(T element);     // Removes an element
+    bool find(T element);       // Finds an element
+    size_t size();              // Returns number of elements
+
+    void Splay(T element, Node *node) const;
 };
 
 /**
  *  Constructor for tree
- *  @params; none
  */
 template <typename T>
 SplayTree<T>::SplayTree() {
@@ -106,6 +110,11 @@ void SplayTree<T>::remove(T element) {
     root = newTree;
 }
 
+/**
+ * Will look for a match to the passed parameter
+ *  @param T element; template variable being the value that is looked for
+ *  @return bool; returns true if the value have been found, otherwise false
+ */
 template <typename T>
 bool SplayTree<T>::find(T element) {
     if(root == nullptr) {
@@ -119,9 +128,53 @@ bool SplayTree<T>::find(T element) {
     return true; // item does exist in tree
 }
 
+/**
+ *  Function that returns the num of elements in the tree
+ *  @param; none
+ *  @return size_t; number of elements in the tree
+ */
 template <typename T>
 size_t SplayTree<T>::size() {
     return this->numOfElements;
+}
+
+// ================Helper functions ===========
+
+/**
+ * Function that will be executed after every access that have been done in the tree;
+ *  rotating the last accessed node to the root.
+ *  @param T element; Template variable representing the variable that the splay-
+ * function needs to rotate the element to the root-node
+ * @param Node *node; Node object being a placeholder object for traversing the tree
+ * @return; void
+ */
+
+template <typename T>
+void SplayTree<T>::splay(T element, Node *node) {
+    Node *leftMaxTree, *rightTreeMin;
+    static Node header;
+
+    header.leftChild = header.rightChild = nullptr;
+    leftTreeMax = rightTreeMin = &header;
+
+    Node *emptyNode = new Node();
+    emptyNode->leftChild = nullptr;
+    emptyNode->rightChild = nullptr;
+    emptyNode->value = element;
+
+    for( ; ; ) {
+        if (element < node->value) {
+            if (x < node->leftChild->value) {
+                //rotateWithLeftChild(node);
+            }
+            if (node->leftChild == nullptr) {
+                break;
+            }
+            rightTreeMin->leftChild = node;
+            rightTreeMin = node;
+            node = node->leftChild;
+        }
+    }
 }
 
 #endif
