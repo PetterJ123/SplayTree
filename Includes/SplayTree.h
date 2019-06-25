@@ -31,8 +31,13 @@ public:
     void remove(T element);     // Removes an element
     bool find(T element);       // Finds an element
     size_t size();              // Returns number of elements
+    T getMin() const;           // Gets the minimum value in tree
+    //T getMax() const;         // Gets the maximum value in the tree
+    //T getRoot() const;        // Gets the root node
 
     void splay(T element, Node *node) const;
+    void rotateLeftChild(Node *node2) const;
+    void rotateRightChild(Node *node1) const;
 };
 
 /**
@@ -83,7 +88,7 @@ void SplayTree<T>::insert(T element) {
             throw std::logic_error("Logic error");
         }
     }
-    newNode = nullptr;
+    newNode = nullptr;  // 
 }
 
 /**
@@ -177,7 +182,7 @@ void SplayTree<T>::splay(T element, Node *node) const {
             if (node->rightChild->value < element) {
                 // rotateWithRightChild(node);
             }
-            if (node->rigthChild == nullptr) {
+            if (node->rightChild == nullptr) {
                 break;
             }
             leftTreeMax->rightChild = node;
@@ -189,8 +194,45 @@ void SplayTree<T>::splay(T element, Node *node) const {
 
         leftTreeMax->rightChild = node->leftChild;
         rightTreeMin->leftChild = node->rightChild;
-        node->rightChild = header.left;
+        node->rightChild = header.leftChild;
     }
+}
+
+/**
+ * Function that rotates a parent-node with its left child
+ * @param node2; pointer to the node that is suppoesed to be rotated
+ * @retun; void
+ */
+template <typename T>
+void SplayTree<T>::rotateLeftChild(Node *node2) const {
+    Node *node1 = node2->leftChild;
+    node2->leftChild = node1->rightChild;
+    node1->rightChild = node2;
+    node2 = node1;
+}
+
+/**
+ * Function that rotates a parent-node with it's right child
+ * @param node1; pointer to the child node that is supposed to be rotated
+ * @return; void
+ */
+template <typename T>
+void SplayTree<T>::rotateRightChild(Node *node1) const {
+    Node *node2 = node1->rightChild;
+    node1->rightChild = node2->leftChild;
+    node2->leftChild = node1;
+    node1 = node2;
+}
+
+template <typename T>
+T SplayTree<T>::getMin() const {
+    Node *rptr = root;
+
+    while(rptr->leftChild != nullptr) {
+        rptr = rptr->leftChild;
+    }
+    splay(rptr->value, root);
+    return rptr->value;
 }
 
 #endif
