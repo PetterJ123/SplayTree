@@ -8,7 +8,6 @@ class SplayTree {
 private:
     /** Node class representing each node containing a reference to left and right children  and also a value that the node holds onto
      */
-    
     class Node {
     public:
         T value;
