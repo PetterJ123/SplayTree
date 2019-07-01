@@ -75,20 +75,21 @@ template <typename T>
 void SplayTree<T>::insertRecursive(T element, Node *nodeTrv) {
     if(root == nullptr) {
         root = initNode(element);
+        numOfElements++;
     } else if(nodeTrv->value > element) {
         if(nodeTrv->leftChild != nullptr) {
             insertRecursive(element, nodeTrv->leftChild);
         } else {
             nodeTrv->leftChild = initNode(element);
+            numOfElements++;
         }
     } else if(nodeTrv->value < element) {
         if(nodeTrv->rightChild != nullptr) {
             insertRecursive(element, nodeTrv->rightChild);
         } else {
             nodeTrv->rightChild = initNode(element);
+            numOfElements++;
         }
-    } else {
-        throw std::invalid_argument(element + " not inserted, already exists!");
     }
 }
 
