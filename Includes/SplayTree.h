@@ -6,8 +6,6 @@
 template <class T>
 class SplayTree {
 private:
-    /** Node class representing each node containing a reference to left and right children  and also a value that the node holds onto
-     */
     class Node {
     public:
         T value;
@@ -24,7 +22,13 @@ private:
     Node *root;
     size_t numOfElements;
     
-    // void insertRecursive(T element, Node *ptr);
+    Node* initNode(T element) {
+        Node* node = new Node();
+        node->value = element;
+        
+        return node;
+    }
+    void insertRecursive(T element, Node *ptr);
     void splay(T element, Node *node) const;
     void rotateLeftChild(Node *node2) const;
     void rotateRightChild(Node *node1) const;
@@ -38,7 +42,6 @@ public:
     T getMin() const;           // Gets the minimum value in tree
     //T getMax() const;         // Gets the maximum value in the tree
     //T getRoot() const;        // Gets the root node
-
 };
 
 /**
@@ -57,29 +60,29 @@ SplayTree<T>::SplayTree() {
  */
 template <typename T>
 void SplayTree<T>::insert(T element) {
-    // insertRecursive(element, root);
+    insertRecursive(element, root);
 }
 
-// template <typename T>
-// void SplayTree<T>::insertRecursive(T element, Node *nodeTrv) {
-//     if(root == nullptr) {
-//         root = initNode(element);
-//     } else if(nodeTrv->value > element) {
-//         if(nodeTrv->leftChild != nullptr) {
-//             insertRecursive(element, nodeTrv->leftChild);
-//         } else {
-//             nodeTrv->leftChild = initNode(element);
-//         }
-//     } else if(nodeTrv->value < element) {
-//         if(nodeTrv->rightChild != nullptr) {
-//             insertRecursive(element, nodeTrv->rightChild);
-//         } else {
-//             nodeTrv->rightChild = initNode(element);
-//         }
-//     } else {
-//         throw std::invalid_argument("Element already exists!");
-//     }
-// }
+template <typename T>
+void SplayTree<T>::insertRecursive(T element, Node *nodeTrv) {
+    if(root == nullptr) {
+        root = initNode(element);
+    } else if(nodeTrv->value > element) {
+        if(nodeTrv->leftChild != nullptr) {
+            insertRecursive(element, nodeTrv->leftChild);
+        } else {
+            nodeTrv->leftChild = initNode(element);
+        }
+    } else if(nodeTrv->value < element) {
+        if(nodeTrv->rightChild != nullptr) {
+            insertRecursive(element, nodeTrv->rightChild);
+        } else {
+            nodeTrv->rightChild = initNode(element);
+        }
+    } else {
+        throw std::invalid_argument(element + " not inserted, already exists!");
+    }
+}
 
 /**
  * Removes a given element from the tree
