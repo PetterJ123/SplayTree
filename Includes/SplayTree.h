@@ -82,6 +82,7 @@ void SplayTree<T>::insertRecursive(T element, Node *nodeTrv) {
         } else {
             nodeTrv->leftChild = initNode(element);
             numOfElements++;
+            splay(element, nodeTrv->leftChild);
         }
     } else if(nodeTrv->value < element) {
         if(nodeTrv->rightChild != nullptr) {
@@ -89,6 +90,7 @@ void SplayTree<T>::insertRecursive(T element, Node *nodeTrv) {
         } else {
             nodeTrv->rightChild = initNode(element);
             numOfElements++;
+            splay(element, nodeTrv->rightChild);
         }
     }
 }
@@ -142,7 +144,7 @@ bool SplayTree<T>::find(T element) {
  */
 template <typename T>
 size_t SplayTree<T>::size() {
-    return this->numOfElements;
+    return numOfElements;
 }
 
 // ================Helper functions ===========
@@ -234,6 +236,7 @@ T SplayTree<T>::getMin() const {
         rptr = rptr->leftChild;
     }
     splay(rptr->value, root);
+    
     return rptr->value;
 }
 
