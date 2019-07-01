@@ -13,18 +13,21 @@ private:
         T value;
         Node *leftChild;
         Node *rightChild;
-        Node *parent;
 
         Node() {
             value = -1;
             leftChild = nullptr;
             rightChild = nullptr;
-            parent = nullptr;
         }
     };
 
     Node *root;
     size_t numOfElements;
+    
+    // void insertRecursive(T element, Node *ptr);
+    void splay(T element, Node *node) const;
+    void rotateLeftChild(Node *node2) const;
+    void rotateRightChild(Node *node1) const;
 
 public:
     SplayTree();
@@ -36,12 +39,6 @@ public:
     //T getMax() const;         // Gets the maximum value in the tree
     //T getRoot() const;        // Gets the root node
 
-    void splay(T element, Node *node) const;
-    void rotateLeftChild(Node *node2) const;
-    void rotateRightChild(Node *node1) const;
-
-    void insertRecursive(T element, Node *ptr);
-    Node* newNode(T element);
 };
 
 /**
@@ -60,39 +57,29 @@ SplayTree<T>::SplayTree() {
  */
 template <typename T>
 void SplayTree<T>::insert(T element) {
-    insertRecursive(element, root);
+    // insertRecursive(element, root);
 }
 
-template <typename T>
-void SplayTree<T>::insertRecursive(T element, Node *nodeTrv) {
-    if(root == nullptr) {
-        root = newNode(element);
-    } else if(nodeTrv->value > element) {
-        if(nodeTrv->leftChild != nullptr) {
-            insertRecursive(element, nodeTrv->leftChild);
-        } else {
-            nodeTrv->leftChild = newNode(element);
-        }
-    } else if(nodeTrv->value < element) {
-        if(nodeTrv->rightChild != nullptr) {
-            insertRecursive(element, nodeTrv->rightChild);
-        } else {
-            nodeTrv->rightChild = newNode(element);
-        }
-    } else {
-        throw std::invalid_argument("Element already exists!");
-    }
-}
-
-template <typename T>
-Node* SplayTree<T>::newNode(T element) {
-    Node *node = new Node();
-    node->leftChild = nullptr;
-    node->rightChild = nullptr;
-    node->value = element;
-
-    return node;
-}
+// template <typename T>
+// void SplayTree<T>::insertRecursive(T element, Node *nodeTrv) {
+//     if(root == nullptr) {
+//         root = initNode(element);
+//     } else if(nodeTrv->value > element) {
+//         if(nodeTrv->leftChild != nullptr) {
+//             insertRecursive(element, nodeTrv->leftChild);
+//         } else {
+//             nodeTrv->leftChild = initNode(element);
+//         }
+//     } else if(nodeTrv->value < element) {
+//         if(nodeTrv->rightChild != nullptr) {
+//             insertRecursive(element, nodeTrv->rightChild);
+//         } else {
+//             nodeTrv->rightChild = initNode(element);
+//         }
+//     } else {
+//         throw std::invalid_argument("Element already exists!");
+//     }
+// }
 
 /**
  * Removes a given element from the tree
