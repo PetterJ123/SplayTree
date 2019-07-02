@@ -29,9 +29,9 @@ private:
         return node;
     }
     void insertRecursive(T element, Node *ptr);
-    void splay(T element, Node *node) const;
-    void rotateLeftChild(Node *node2) const;
-    void rotateRightChild(Node *node1) const;
+    void splay(T element, Node *node);
+    void rotateLeftChild(Node *node2);
+    void rotateRightChild(Node *node1);
 
 public:
     SplayTree();
@@ -39,9 +39,9 @@ public:
     void remove(T element);     // Removes an element
     bool find(T element);       // Finds an element
     size_t size();              // Returns number of elements
-    T getMin() const;           // Gets the minimum value in tree
-    T getMax() const;           // Gets the maximum value in the tree
-    T getRoot() const;          // Gets the root node
+    T getMin();                 // Gets the minimum value in tree
+    T getMax();                 // Gets the maximum value in the tree
+    T getRoot();                // Gets the root node
 };
 
 /**
@@ -159,7 +159,7 @@ size_t SplayTree<T>::size() {
  */
 
 template <typename T>
-void SplayTree<T>::splay(T element, Node *node) const {
+void SplayTree<T>::splay(T element, Node *node) {
     Node *leftTreeMax, *rightTreeMin;
     static Node header;
 
@@ -208,7 +208,7 @@ void SplayTree<T>::splay(T element, Node *node) const {
  * @retun; void
  */
 template <typename T>
-void SplayTree<T>::rotateLeftChild(Node *node2) const {
+void SplayTree<T>::rotateLeftChild(Node *node2) {
     Node *node1 = node2->leftChild;
     node2->leftChild = node1->rightChild;
     node1->rightChild = node2;
@@ -221,15 +221,20 @@ void SplayTree<T>::rotateLeftChild(Node *node2) const {
  * @return; void
  */
 template <typename T>
-void SplayTree<T>::rotateRightChild(Node *node1) const {
+void SplayTree<T>::rotateRightChild(Node *node1) {
     Node *node2 = node1->rightChild;
     node1->rightChild = node2->leftChild;
     node2->leftChild = node1;
     node1 = node2;
 }
 
+/**
+ * Function that gets the smallest value in the tree
+ * @param; void
+ * @return; template variable
+ */
 template <typename T>
-T SplayTree<T>::getMin() const {
+T SplayTree<T>::getMin() {
     Node *treeTrav = root;
 
     while(treeTrav->leftChild != nullptr) {
@@ -240,8 +245,13 @@ T SplayTree<T>::getMin() const {
     return treeTrav->value;
 }
 
+/**
+ * Function that gets the highest value in the tree
+ * @param; void
+ * @return; template variable
+ */
 template <typename T>
-T SplayTree<T>::getMax() const {
+T SplayTree<T>::getMax() {
     Node *treeTrav = root;
 
     while(treeTrav->rightChild != nullptr) {
@@ -252,8 +262,13 @@ T SplayTree<T>::getMax() const {
     return treeTrav->value;
 }
 
+/**
+ * Function the returns the root node in the tree
+ * @param; void
+ * @return; template variable
+ */
 template <typename T>
-T SplayTree<T>::getRoot() const {
+T SplayTree<T>::getRoot() {
     return root->value;
 }
 
