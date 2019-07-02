@@ -63,7 +63,6 @@ void SplayTree<T>::insert(T element) {
     insertRecursive(element, root);
 }
 
-
 /**
  * Recursive insert function that will go through
  * the tree and insert a new value at the right place
@@ -103,16 +102,17 @@ void SplayTree<T>::insertRecursive(T element, Node *nodeTrv) {
 template <typename T>
 void SplayTree<T>::remove(T element) {
     Node *newTree;
-    // splay() goes here
+    
     if (root->value != element) {
         return; // Parameter passed to function wasn't found
     }
 
     if(root->leftChild == nullptr) {
         newTree = root->rightChild;
+        splay(element, newTree);
     } else {
         newTree = root->leftChild;
-        // splay() goes here
+        splay(element, newTree);
         newTree->rightChild = root->rightChild;
     }
     delete root;
