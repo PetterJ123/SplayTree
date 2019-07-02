@@ -1,3 +1,19 @@
+/**
+ * TODO:
+ *      - Splaying not executed as expected
+ *          * Functions affected:
+ *              *- insert
+ *              *- remove
+ *              *- find
+ *      - Node rotation (zig-zig and so on) not executed as expected
+ *          * Function responsible:
+ *              *- Splay
+ *          * Functions affected:
+ *              *- insert
+ *              *- remove
+ *              *- find
+ */
+
 #ifndef SPLAYTREE_H
 #define SPLAYTREE_H
 
@@ -30,8 +46,10 @@ private:
     }
     void insertRecursive(T element, Node *ptr);
     void splay(T element, Node *node);
-    void rotateLeftChild(Node *node2);
-    void rotateRightChild(Node *node1);
+    void zigRotate(Node *childNode);
+    void zagRotate(Node *childNode);
+    void zigZigRotate(Node *childNode);
+    void zagZagRotate(Node *childNode);
 
 public:
     SplayTree();
@@ -81,7 +99,7 @@ void SplayTree<T>::insertRecursive(T element, Node *nodeTrv) {
         } else {
             nodeTrv->leftChild = initNode(element);
             numOfElements++;
-            splay(element, nodeTrv->leftChild);
+            // splay(element, nodeTrv->leftChild);
         }
     } else if(nodeTrv->value < element) {
         if(nodeTrv->rightChild != nullptr) {
@@ -89,7 +107,7 @@ void SplayTree<T>::insertRecursive(T element, Node *nodeTrv) {
         } else {
             nodeTrv->rightChild = initNode(element);
             numOfElements++;
-            splay(element, nodeTrv->rightChild);
+            // splay(element, nodeTrv->rightChild);
         }
     }
 }
@@ -202,33 +220,8 @@ void SplayTree<T>::splay(T element, Node *node) {
     }
 }
 
-/**
- * Function that rotates a parent-node with its left child
- * @param node2; pointer to the node that is suppoesed to be rotated
- * @retun; void
- */
-template <typename T>
-void SplayTree<T>::rotateLeftChild(Node *node2) {
-    Node *node1 = node2->leftChild;
-    node2->leftChild = node1->rightChild;
-    node1->rightChild = node2;
-    node2 = node1;
-}
 
-/**
- * Function that rotates a parent-node with it's right child
- * @param node1; pointer to the child node that is supposed to be rotated
- * @return; void
- */
-template <typename T>
-void SplayTree<T>::rotateRightChild(Node *node1) {
-    Node *node2 = node1->rightChild;
-    node1->rightChild = node2->leftChild;
-    node2->leftChild = node1;
-    node1 = node2;
-}
-
-/**
+/** [DONE!]
  * Function that gets the smallest value in the tree
  * @param; void
  * @return; template variable
@@ -245,7 +238,7 @@ T SplayTree<T>::getMin() {
     return treeTrav->value;
 }
 
-/**
+/** [DONE!]
  * Function that gets the highest value in the tree
  * @param; void
  * @return; template variable
@@ -262,7 +255,7 @@ T SplayTree<T>::getMax() {
     return treeTrav->value;
 }
 
-/**
+/** [DONE!] (ish, root node doesn't match, but not this functions fault)
  * Function the returns the root node in the tree
  * @param; void
  * @return; template variable
