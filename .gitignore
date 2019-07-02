@@ -1,8 +1,8 @@
 .vscode/
 *.zip
 Laboration_2_Submission_Tests/
-Bin/SplayTree.exe
-Bin/Tests.o
+Bin/*.exe
+Build/*.o
 *.pdf
 *.code-workspace
 *.cpp
