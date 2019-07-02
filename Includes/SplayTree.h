@@ -40,8 +40,8 @@ public:
     bool find(T element);       // Finds an element
     size_t size();              // Returns number of elements
     T getMin() const;           // Gets the minimum value in tree
-    //T getMax() const;         // Gets the maximum value in the tree
-    //T getRoot() const;        // Gets the root node
+    T getMax() const;           // Gets the maximum value in the tree
+    T getRoot() const;          // Gets the root node
 };
 
 /**
@@ -174,7 +174,7 @@ void SplayTree<T>::splay(T element, Node *node) const {
     for( ; ; ) {
         if (element < node->value) {
             if (element < node->leftChild->value) {
-                //rotateWithLeftChild(node);
+                rotateLeftChild(node);
             }
             if (node->leftChild == nullptr) {
                 break;
@@ -184,7 +184,7 @@ void SplayTree<T>::splay(T element, Node *node) const {
             node = node->leftChild;
         } else if (node->value < element) {
             if (node->rightChild->value < element) {
-                // rotateWithRightChild(node);
+                rotateRightChild(node);
             }
             if (node->rightChild == nullptr) {
                 break;
@@ -230,14 +230,31 @@ void SplayTree<T>::rotateRightChild(Node *node1) const {
 
 template <typename T>
 T SplayTree<T>::getMin() const {
-    Node *rptr = root;
+    Node *treeTrav = root;
 
-    while(rptr->leftChild != nullptr) {
-        rptr = rptr->leftChild;
+    while(treeTrav->leftChild != nullptr) {
+        treeTrav = treeTrav->leftChild;
     }
-    splay(rptr->value, root);
+    splay(treeTrav->value, treeTrav);
     
-    return rptr->value;
+    return treeTrav->value;
+}
+
+template <typename T>
+T SplayTree<T>::getMax() const {
+    Node *treeTrav = root;
+
+    while(treeTrav->rightChild != nullptr) {
+        treeTrav = treeTrav->rightChild;
+    }
+    splay(treeTrav->value, treeTrav);
+
+    return treeTrav->value;
+}
+
+template <typename T>
+T SplayTree<T>::getRoot() const {
+    return root->value;
 }
 
 #endif
