@@ -1,6 +1,8 @@
 .vscode/
 *.zip
 Laboration_2_Submission_Tests/
-
+*.exe
+*.cpp
+*.o
 *.pdf
 *.code-workspace
