@@ -2,7 +2,5 @@
 *.zip
 Laboration_2_Submission_Tests/
 *.o
-*.exe
 *.pdf
 *.code-workspace
-*.cpp
