@@ -1,19 +1,3 @@
-/**
- * TODO:
- *      - Splaying not executed as expected
- *          * Functions affected:
- *              *- insert
- *              *- remove
- *              *- find
- *      - Node rotation (zig-zig and so on) not executed as expected
- *          * Function responsible:
- *              *- Splay
- *          * Functions affected:
- *              *- insert
- *              *- remove
- *              *- find
- */
-
 #ifndef SPLAYTREE_H
 #define SPLAYTREE_H
 
@@ -35,6 +19,8 @@ private:
         }
     };
 
+
+public:
     Node *root;
     size_t numOfElements;
     
@@ -45,13 +31,7 @@ private:
         return node;
     }
     void insertRecursive(T element, Node *ptr);
-    void splay(T element, Node *node);
-    void zigRotate(Node *childNode);
-    void zagRotate(Node *childNode);
-    void zigZigRotate(Node *childNode);
-    void zagZagRotate(Node *childNode);
-
-public:
+    
     SplayTree();
     void insert(T element);     // Inserts an element
     void remove(T element);     // Removes an element
@@ -127,13 +107,14 @@ void SplayTree<T>::remove(T element) {
 
     if(root->leftChild == nullptr) {
         newTree = root->rightChild;
-        splay(element, newTree);
+        // splay(element, newTree);
     } else {
         newTree = root->leftChild;
-        splay(element, newTree);
+        // splay(element, newTree);
         newTree->rightChild = root->rightChild;
     }
     delete root;
+    numOfElements--;
     root = newTree;
 }
 
@@ -175,50 +156,6 @@ size_t SplayTree<T>::size() {
  * @param Node *node; Node object being a placeholder object for traversing the tree
  * @return; void
  */
-
-template <typename T>
-void SplayTree<T>::splay(T element, Node *node) {
-    Node *leftTreeMax, *rightTreeMin;
-    static Node header;
-
-    header.leftChild = header.rightChild = nullptr;
-    leftTreeMax = rightTreeMin = &header;
-
-    Node *emptyNode = new Node();
-    emptyNode->leftChild = nullptr;
-    emptyNode->rightChild = nullptr;
-    emptyNode->value = element;
-
-    for( ; ; ) {
-        if (element < node->value) {
-            if (element < node->leftChild->value) {
-                rotateLeftChild(node);
-            }
-            if (node->leftChild == nullptr) {
-                break;
-            }
-            rightTreeMin->leftChild = node;
-            rightTreeMin = node;
-            node = node->leftChild;
-        } else if (node->value < element) {
-            if (node->rightChild->value < element) {
-                rotateRightChild(node);
-            }
-            if (node->rightChild == nullptr) {
-                break;
-            }
-            leftTreeMax->rightChild = node;
-            leftTreeMax = node;
-            node = node->rightChild;
-        } else {
-            break;
-        }
-
-        leftTreeMax->rightChild = node->leftChild;
-        rightTreeMin->leftChild = node->rightChild;
-        node->rightChild = header.leftChild;
-    }
-}
 
 
 /** [DONE!]
