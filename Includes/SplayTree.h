@@ -2,6 +2,7 @@
 #define SPLAYTREE_H
 
 #include <stdexcept>
+#include <iostream>
 
 template <class T>
 class SplayTree {
@@ -19,27 +20,29 @@ private:
         }
     };
 
-
-public:
     Node *root;
     size_t numOfElements;
-    
+
     Node* initNode(T element) {
         Node* node = new Node();
         node->value = element;
-        
+
         return node;
     }
+
     void insertRecursive(T element, Node *ptr);
-    
+    void removeRecursive(T element, Node *ptr);
+    Node* findRecursive(T element, Node *ptr);
+
+public:
     SplayTree();
-    void insert(T element);     // Inserts an element
+    void insert(T element);     // Inserts an element [DONE]
     void remove(T element);     // Removes an element
     bool find(T element);       // Finds an element
-    size_t size();              // Returns number of elements
-    T getMin();                 // Gets the minimum value in tree
-    T getMax();                 // Gets the maximum value in the tree
-    T getRoot();                // Gets the root node
+    size_t size();              // Returns number of elements [DONE]
+    T getMin();                 // Gets the minimum value in tree [DONE]
+    T getMax();                 // Gets the maximum value in the tree [DONE]
+    T getRoot();                // Gets the root node [DONE]
 };
 
 /**
@@ -79,16 +82,16 @@ void SplayTree<T>::insertRecursive(T element, Node *nodeTrv) {
         } else {
             nodeTrv->leftChild = initNode(element);
             numOfElements++;
-            // splay(element, nodeTrv->leftChild);
         }
+            // splay(element, nodeTrv->leftChild);
     } else if(nodeTrv->value < element) {
         if(nodeTrv->rightChild != nullptr) {
             insertRecursive(element, nodeTrv->rightChild);
         } else {
             nodeTrv->rightChild = initNode(element);
             numOfElements++;
-            // splay(element, nodeTrv->rightChild);
         }
+            // splay(element, nodeTrv->rightChild);
     }
 }
 
@@ -99,23 +102,30 @@ void SplayTree<T>::insertRecursive(T element, Node *nodeTrv) {
  */
 template <typename T>
 void SplayTree<T>::remove(T element) {
-    Node *newTree;
-    
-    if (root->value != element) {
-        return; // Parameter passed to function wasn't found
-    }
+    removeRecursive(element, root);
+}
 
-    if(root->leftChild == nullptr) {
-        newTree = root->rightChild;
-        // splay(element, newTree);
-    } else {
-        newTree = root->leftChild;
-        // splay(element, newTree);
-        newTree->rightChild = root->rightChild;
+template <typename T>
+void SplayTree<T>::removeRecursive(T element, Node *ptr) {
+    if(root == nullptr) {
+        std::out_of_range("Out_of_range error; tree is empty!");
+    } else if(ptr->value > element) {
+        if(ptr->leftChild != nullptr) {
+            removeRecursive(element, ptr->leftChild);
+        } else {
+            // remove node
+            numOfElements--;
+        }
+        // splay();
+    } else if(ptr->value < element) {
+        if(ptr->rightChild != nullptr) {
+            removeRecursive(element, ptr->rightChild);
+        } else {
+            // remove node
+            numOfElements--;
+        }
+        // splay();
     }
-    delete root;
-    numOfElements--;
-    root = newTree;
 }
 
 /**
@@ -125,15 +135,30 @@ void SplayTree<T>::remove(T element) {
  */
 template <typename T>
 bool SplayTree<T>::find(T element) {
-    if(root == nullptr) {
-        throw std::out_of_range("Out_of_range error; tree is empty");
-    }
-    // splay() goes here
-    if(root->value != element) {
-        return false; // item doesn't exists in tree
-    }
+    Node *nodePtr = findRecursive(element, root);
 
-    return true; // item does exist in tree
+    if(nodePtr == nullptr) {
+        return true; // element exists
+    } else {
+        return false; // element doesn't exist
+    }
+}
+
+template <typename T>
+Node* SplayTree<T>::findRecursive(T element, Node *ptr) {
+    if(ptr != nullptr) {
+        if(element == ptr->value) {
+            return true;
+        }
+
+        if(element < ptr->value) {
+            return search(element, ptr->leftChild);
+        } else {
+            return search(element, ptr->rightChild);
+        }
+    } else {
+        return nullptr;
+    }
 }
 
 /**
@@ -170,8 +195,8 @@ T SplayTree<T>::getMin() {
     while(treeTrav->leftChild != nullptr) {
         treeTrav = treeTrav->leftChild;
     }
-    splay(treeTrav->value, treeTrav);
-    
+    // splay(treeTrav->value, treeTrav);
+
     return treeTrav->value;
 }
 
@@ -187,7 +212,7 @@ T SplayTree<T>::getMax() {
     while(treeTrav->rightChild != nullptr) {
         treeTrav = treeTrav->rightChild;
     }
-    splay(treeTrav->value, treeTrav);
+    // splay(treeTrav->value, treeTrav);
 
     return treeTrav->value;
 }
