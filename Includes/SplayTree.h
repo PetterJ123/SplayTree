@@ -32,7 +32,6 @@ private:
 
     void insertRecursive(T element, Node *ptr);
     void removeRecursive(T element, Node *ptr);
-    Node* findRecursive(T element, Node *ptr);
 
 public:
     SplayTree();
@@ -135,30 +134,19 @@ void SplayTree<T>::removeRecursive(T element, Node *ptr) {
  */
 template <typename T>
 bool SplayTree<T>::find(T element) {
-    Node *nodePtr = findRecursive(element, root);
-
-    if(nodePtr == nullptr) {
-        return true; // element exists
-    } else {
-        return false; // element doesn't exist
-    }
-}
-
-template <typename T>
-Node* SplayTree<T>::findRecursive(T element, Node *ptr) {
-    if(ptr != nullptr) {
-        if(element == ptr->value) {
+    Node *nodePtr = root;
+    while(nodePtr != nullptr) {
+        if(nodePtr->value == element) {
             return true;
-        }
-
-        if(element < ptr->value) {
-            return search(element, ptr->leftChild);
+        } else if(element < nodePtr->value) {
+            nodePtr = nodePtr->leftChild;
+        } else if(element > nodePtr->value) {
+            nodePtr = nodePtr->rightChild;
         } else {
-            return search(element, ptr->rightChild);
+            return false;
         }
-    } else {
-        return nullptr;
     }
+    return false;
 }
 
 /**
