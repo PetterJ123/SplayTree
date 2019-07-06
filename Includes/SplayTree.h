@@ -22,6 +22,7 @@ private:
 
     Node *root;
     size_t numOfElements;
+    std::vector<T> inOrderElements;
 
     Node* initNode(T element) {
         Node* node = new Node();
@@ -116,6 +117,8 @@ private:
     // Node* splay(Node *node, T element);
     void insertRecursive(T element, Node *ptr);
     void removeRecursive(T element, Node *ptr);
+    std::vector<T> inorderRecursive(Node *rootPtr);
+    void inorder();
 
 public:
     SplayTree();
@@ -127,7 +130,7 @@ public:
     T getMax();                 // Gets the maximum value in the tree [DONE]
     T getRoot();                // Gets the root node [DONE]
     // std::vector<T> preOrderWalk() const;
-    // std::vector<T> inOrderWalk() const;
+    std::vector<T> inOrderWalk() const;
     // std::vector<T> postOrderWalk() const;
 };
 
@@ -247,15 +250,7 @@ size_t SplayTree<T>::size() {
     return numOfElements;
 }
 
-// ================Helper functions ===========
-
 /**
- * Function that will be executed after every access that have been done in the tree;
- * rotating the last accessed node to the root.
- */
-
-
-/** [DONE!]
  * Function that gets the smallest value in the tree
  * @param; void
  * @return; template variable
@@ -272,7 +267,7 @@ T SplayTree<T>::getMin() {
     return treeTrav->value;
 }
 
-/** [DONE!]
+/**
  * Function that gets the highest value in the tree
  * @param; void
  * @return; template variable
@@ -289,7 +284,7 @@ T SplayTree<T>::getMax() {
     return treeTrav->value;
 }
 
-/** [DONE!] (ish, root node doesn't match, but not this functions fault)
+/**
  * Function the returns the root node in the tree
  * @param; void
  * @return; template variable
@@ -299,4 +294,43 @@ T SplayTree<T>::getRoot() {
     return root->value;
 }
 
+/**
+ * Function inserting a tree´s values according to pre-order principles
+ * @param; void
+ * @return std::vector; returns a vector containing values according to pre-order principles
+ */
+// template <typename T>
+// std::vector<T> SplayTree<T>::preOrderWalk() const {
+
+// }
+
+/**
+ * Function inserting a tree´s values according to pre-order principles
+ * @param; void
+ * @return std::vector; returns a vector containing values according to pre-order principles
+ */
+template <typename T>
+std::vector<T> SplayTree<T>::inOrderWalk() const {
+    return inOrderElements;
+}
+
+template <typename T>
+void SplayTree<T>::inorder() {
+    if(root == nullptr) {
+        std::out_of_range("Tree is empty");
+    }
+
+    inOrderElements = inoderRecursive(root);
+}
+
+template <typename T>
+std::vector<T> SplayTree<T>::inorderRecursive(Node *rootPtr) {
+    std::vector<T> elements;
+
+    inorderRecursive(rootPtr->leftChild);
+    elements.insert(rootPtr->value);
+    inorderRecursive(rootPtr->rightChild);
+
+    return elements;
+}
 #endif
