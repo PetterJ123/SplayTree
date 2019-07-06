@@ -126,7 +126,7 @@ public:
     T getMin();                 // Gets the minimum value in tree [DONE]
     T getMax();                 // Gets the maximum value in the tree [DONE]
     T getRoot();                // Gets the root node [DONE]
-    std::vector<T> preOrderWalk() const;
+    // std::vector<T> preOrderWalk() const;
     // std::vector<T> inOrderWalk() const;
     // std::vector<T> postOrderWalk() const;
 };
