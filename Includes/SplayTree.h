@@ -2,7 +2,7 @@
 #define SPLAYTREE_H
 
 #include <stdexcept>
-#include <iostream>
+#include <vector>
 
 template <class T>
 class SplayTree {
@@ -30,8 +30,88 @@ private:
         return node;
     }
 
+    Node* splay(Node *node, T element) {
+        Node N, *le, *ri, *c;
+        if(node == nullptr) {
+            return nullptr;
+        }
+
+        N.leftChild = N.rightChild = nullptr;
+        le = ri = &N;
+
+        for(;;) {
+            if(node->value > element) {
+
+                if(node->leftChild == nullptr) {
+                    break;
+                }
+
+                if(node->leftChild->value > element) {
+                    c = node->leftChild;
+                    node->leftChild = c->rightChild;
+                    c->rightChild = node;
+                    node = c;
+
+                    if(node->leftChild == nullptr) {
+                        break;
+                    }
+                }
+                ri->leftChild = node;
+                ri = node;
+                node = node->leftChild;
+            }
+            else if(node->value < element)
+            {
+                if(node->rightChild == nullptr) {
+                    break;
+                }
+
+                if(node->rightChild->value < element) {
+                    c = node->rightChild;
+                    node->rightChild = c->leftChild;
+                    c->leftChild = node;
+                    node = c;
+
+                    if(node->rightChild == nullptr) {
+                        break;
+                    }
+                }
+                le->rightChild = node;
+                le = node;
+                node = node->rightChild;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        le->rightChild = node->leftChild;
+        ri->leftChild = node->rightChild;
+        node->leftChild = N.rightChild;
+        node->rightChild = N.leftChild;
+
+        return node;
+    }
+
+    Node* search(Node* node, T element) {
+        if(node == nullptr || node->value == element) {
+            return node;
+        }
+
+        if(node->value > element) {
+            return search(node->leftChild, element);
+        } else {
+            return search(node->rightChild, element);
+        }
+    }
+
+    // Node* splay(Node *node, T element);
     void insertRecursive(T element, Node *ptr);
     void removeRecursive(T element, Node *ptr);
+    std::vector<T> preOrder(Node* node) const;
+    void inOrder(Node* node) const;
+    void postOrder(Node* node) const;
 
 public:
     SplayTree();
@@ -42,6 +122,9 @@ public:
     T getMin();                 // Gets the minimum value in tree [DONE]
     T getMax();                 // Gets the maximum value in the tree [DONE]
     T getRoot();                // Gets the root node [DONE]
+    std::vector<T> preOrderWalk() const;
+    std::vector<T> inOrderWalk() const;
+    std::vector<T> postOrderWalk() const;
 };
 
 /**
@@ -61,6 +144,7 @@ SplayTree<T>::SplayTree() {
 template <typename T>
 void SplayTree<T>::insert(T element) {
     insertRecursive(element, root);
+    root = splay(root, element);
 }
 
 /**
@@ -82,7 +166,6 @@ void SplayTree<T>::insertRecursive(T element, Node *nodeTrv) {
             nodeTrv->leftChild = initNode(element);
             numOfElements++;
         }
-            // splay(element, nodeTrv->leftChild);
     } else if(nodeTrv->value < element) {
         if(nodeTrv->rightChild != nullptr) {
             insertRecursive(element, nodeTrv->rightChild);
@@ -90,7 +173,6 @@ void SplayTree<T>::insertRecursive(T element, Node *nodeTrv) {
             nodeTrv->rightChild = initNode(element);
             numOfElements++;
         }
-            // splay(element, nodeTrv->rightChild);
     }
 }
 
@@ -102,35 +184,37 @@ void SplayTree<T>::insertRecursive(T element, Node *nodeTrv) {
 template <typename T>
 void SplayTree<T>::remove(T element) {
     removeRecursive(element, root);
+    root = splay(root, element);
 }
 
 template <typename T>
 void SplayTree<T>::removeRecursive(T element, Node *ptr) {
-    if(root == nullptr) {
-        std::out_of_range("Out_of_range error; tree is empty!");
-    } else if(ptr->value > element) {
-        if(ptr->leftChild != nullptr) {
-            removeRecursive(element, ptr->leftChild);
-        } else {
-            // remove node
-            numOfElements--;
-        }
-        // splay();
-    } else if(ptr->value < element) {
-        if(ptr->rightChild != nullptr) {
-            removeRecursive(element, ptr->rightChild);
-        } else {
-            // remove node
-            numOfElements--;
-        }
-        // splay();
+    Node* node;
+
+    if(ptr == nullptr) {
+        throw std::out_of_range("Tree seems to be empty!");
     }
+
+    if(search(ptr, element) == nullptr) {
+        throw std::out_of_range("Value doesn't seem to exist! Can't remove item that doesn't exist!");
+    }
+
+    ptr = splay(ptr, element);
+
+    if(ptr->leftChild != nullptr) {
+        node = splay(ptr->leftChild, element);
+        node->rightChild = ptr->rightChild;
+    } else {
+        node = ptr->rightChild;
+    }
+
+    delete ptr;
 }
 
 /**
  * Will look for a match to the passed parameter
- *  @param T element; template variable being the value that is looked for
- *  @return bool; returns true if the value have been found, otherwise false
+ * @param T element; template variable being the value that is looked for
+ * @return bool; returns true if the value have been found, otherwise false
  */
 template <typename T>
 bool SplayTree<T>::find(T element) {
@@ -163,11 +247,7 @@ size_t SplayTree<T>::size() {
 
 /**
  * Function that will be executed after every access that have been done in the tree;
- *  rotating the last accessed node to the root.
- *  @param T element; Template variable representing the variable that the splay-
- * function needs to rotate the element to the root-node
- * @param Node *node; Node object being a placeholder object for traversing the tree
- * @return; void
+ * rotating the last accessed node to the root.
  */
 
 
