@@ -94,6 +94,13 @@ private:
         return node;
     }
 
+    /**
+     * Search-function that is used in removeRecursive function to find the node
+     * requested for deleteion
+     * @param Node* node; root node in this object
+     * @param T element; template variable being the value requested to find
+     * @return Node*; Returns a pointer to the node from removeRecursive
+     */
     Node* search(Node* node, T element) {
         if(node == nullptr || node->value == element) {
             return node;
@@ -109,9 +116,6 @@ private:
     // Node* splay(Node *node, T element);
     void insertRecursive(T element, Node *ptr);
     void removeRecursive(T element, Node *ptr);
-    std::vector<T> preOrder(Node* node) const;
-    void inOrder(Node* node) const;
-    void postOrder(Node* node) const;
 
 public:
     SplayTree();
@@ -123,8 +127,8 @@ public:
     T getMax();                 // Gets the maximum value in the tree [DONE]
     T getRoot();                // Gets the root node [DONE]
     std::vector<T> preOrderWalk() const;
-    std::vector<T> inOrderWalk() const;
-    std::vector<T> postOrderWalk() const;
+    // std::vector<T> inOrderWalk() const;
+    // std::vector<T> postOrderWalk() const;
 };
 
 /**
