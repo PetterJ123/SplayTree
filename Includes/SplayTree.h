@@ -142,6 +142,13 @@ private:
         }
     }
 
+    /**
+     * Recursive remove function that traverses the tree and deletes
+     * the requested node.
+     * @param T element; The value to be deleted
+     * @param Node* ptr; Traverser node
+     * @return; void
+     */
     void removeRecursive(T element, Node *ptr) {
         Node* node;
 
@@ -177,7 +184,27 @@ private:
         this->inOrderElements = vec;
     }
 
-    // std::vector<T> inorderRecursive(Node *rootPtr) const;
+    // std::vector<T> inorderRecursive(Node* ptr) {
+    //     if(rootPtr == nullptr) {
+    //         std::out_of_range("Tree is empty");
+    //     }
+
+    //     std::vector<T> r, x;
+
+    //     if(rootPtr->leftChild != nullptr) {
+    //         x = inorderRecursive(rootPtr->leftChild);
+    //         r.insert(r.end(), x.begin(), x.end());
+    //     }
+
+    //     r.push_back(rootPtr->value);
+
+    //     if(root->rightChild != nullptr) {
+    //         x = inorderRecursive(rootPtr->rightChild);
+    //         r.insert(r.end(), x.begin(), x.end());
+    //     }
+
+    //     return r;
+    // }
 
 public:
     /**
@@ -294,28 +321,5 @@ public:
         return this->inOrderElements;
     }
 };
-
-// template <typename T>
-// std::vector<T> SplayTree<T>::inorderRecursive(Node *rootPtr) const {
-//     if(rootPtr == nullptr) {
-//         std::out_of_range("Tree is empty");
-//     }
-
-//     std::vector<T> r, x;
-
-//     if(rootPtr->leftChild != nullptr) {
-//         x = inorderRecursive(rootPtr->leftChild);
-//         r.insert(r.end(), x.begin(), x.end());
-//     }
-
-//     r.push_back(rootPtr->value);
-
-//     if(root->rightChild != nullptr) {
-//         x = inorderRecursive(rootPtr->rightChild);
-//         r.insert(r.end(), x.begin(), x.end());
-//     }
-
-//     return r;
-// }
 
 #endif
