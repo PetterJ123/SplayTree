@@ -97,7 +97,7 @@ private:
 
     /**
      * Search-function that is used in removeRecursive function to find the node
-     * requested for deleteion
+     * requested for deletion
      * @param Node* node; root node in this object
      * @param T element; template variable being the value requested to find
      * @return Node*; Returns a pointer to the node from removeRecursive
@@ -121,7 +121,7 @@ private:
     * @param nodeTrv; Node pointer used to traverse the tree recursivly
     * @return; void
     */
-    void insertRecursive(T element, Node *ptr) {
+    void insertRecursive(T element, Node *nodeTrv) {
         if(root == nullptr) {
             root = initNode(element);
             numOfElements++;
