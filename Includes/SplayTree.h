@@ -22,7 +22,7 @@ private:
 
     Node *root;
     size_t numOfElements;
-    std::vector<T> inOrderElements;
+    mutable std::vector<T> inOrderElements;
 
     Node* initNode(T element) {
         Node* node = new Node();
@@ -32,13 +32,13 @@ private:
     }
 
     Node* splay(Node *node, T element) {
-        Node N, *le, *ri, *c;
+        Node N, *ltm, *rtm, *c;
         if(node == nullptr) {
             return nullptr;
         }
 
         N.leftChild = N.rightChild = nullptr;
-        le = ri = &N;
+        ltm = rtm = &N;
 
         for(;;) {
             if(node->value > element) {
@@ -57,8 +57,8 @@ private:
                         break;
                     }
                 }
-                ri->leftChild = node;
-                ri = node;
+                rtm->leftChild = node;
+                rtm = node;
                 node = node->leftChild;
             }
             else if(node->value < element)
@@ -77,8 +77,8 @@ private:
                         break;
                     }
                 }
-                le->rightChild = node;
-                le = node;
+                ltm->rightChild = node;
+                ltm = node;
                 node = node->rightChild;
             }
             else
@@ -87,8 +87,8 @@ private:
             }
         }
 
-        le->rightChild = node->leftChild;
-        ri->leftChild = node->rightChild;
+        ltm->rightChild = node->leftChild;
+        rtm->leftChild = node->rightChild;
         node->leftChild = N.rightChild;
         node->rightChild = N.leftChild;
 
@@ -116,11 +116,10 @@ private:
 
     void insertRecursive(T element, Node *ptr);
     void removeRecursive(T element, Node *ptr);
-    // std::vector<T> inorderRecursive(Node *rootPtr);
-    std::vector<T> inorder(Node* rootPtr);
+    // std::vector<T> inorderRecursive(Node *rootPtr) const;
+    void inOrderWalk(Node* rp) const;
 
 public:
-
     SplayTree();
     void insert(T element);     // Inserts an element [DONE]
     void remove(T element);     // Removes an element
@@ -305,46 +304,54 @@ T SplayTree<T>::getRoot() {
 // }
 
 /**
- * Function inserting a tree´s values according to pre-order principles
+ * Function inserting a tree´s values according to in-order principles
  * @param; void
- * @return std::vector; returns a vector containing values according to pre-order principles
+ * @return std::vector<T>; returns a vector containing values according to in-order principles
  */
 template <typename T>
 std::vector<T> SplayTree<T>::inOrderWalk() const {
-    return inorder(this->root);
+    if(root == nullptr) {
+        std::out_of_range("Tree is empty!");
+    } else {
+        inOrderWalk(root);
+    }
+
+    return this->inOrderElements;
 }
 
 template <typename T>
-std::vector<T> SplayTree<T>::inorder(Node* rootPtr) {
-    if(rootPtr == nullptr) {
-        std::out_of_range("Tree is empty");
+void SplayTree<T>::inOrderWalk(Node* rp) const {
+    std::vector<T> vec;
+    if(rp != nullptr) {
+        inOrderWalk(rp->leftChild);
+        vec.push_back(rp->value);
+        inOrderWalk(rp->rightChild);
     }
 
-    std::vector<T> r, x;
-
-    if(rootPtr->leftChild != nullptr) {
-        x = inorder(rootPtr->leftChild);
-        r.insert(r.end(), x.begin(), x.end());
-    }
-
-    r.push_back(rootPtr->value);
-
-    if(root->rightChild != nullptr) {
-        x = inorder(rootPtr->rightChild);
-        r.insert(r.end(), x.begin(), x.end());
-    }
-
-    return r;
+    this->inOrderElements = vec;
 }
 
 // template <typename T>
-// std::vector<T> SplayTree<T>::inorderRecursive(Node *rootPtr) {
-//     std::vector<T> elements;
+// std::vector<T> SplayTree<T>::inorderRecursive(Node *rootPtr) const {
+//     if(rootPtr == nullptr) {
+//         std::out_of_range("Tree is empty");
+//     }
 
-//     inorderRecursive(rootPtr->leftChild);
-//     elements.insert(rootPtr->value);
-//     inorderRecursive(rootPtr->rightChild);
+//     std::vector<T> r, x;
 
-//     return elements;
+//     if(rootPtr->leftChild != nullptr) {
+//         x = inorderRecursive(rootPtr->leftChild);
+//         r.insert(r.end(), x.begin(), x.end());
+//     }
+
+//     r.push_back(rootPtr->value);
+
+//     if(root->rightChild != nullptr) {
+//         x = inorderRecursive(rootPtr->rightChild);
+//         r.insert(r.end(), x.begin(), x.end());
+//     }
+
+//     return r;
 // }
+
 #endif
