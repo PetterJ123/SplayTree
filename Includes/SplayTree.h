@@ -114,13 +114,13 @@ private:
         }
     }
 
-    // Node* splay(Node *node, T element);
     void insertRecursive(T element, Node *ptr);
     void removeRecursive(T element, Node *ptr);
-    std::vector<T> inorderRecursive(Node *rootPtr);
-    void inorder();
+    // std::vector<T> inorderRecursive(Node *rootPtr);
+    std::vector<T> inorder(Node* rootPtr);
 
 public:
+
     SplayTree();
     void insert(T element);     // Inserts an element [DONE]
     void remove(T element);     // Removes an element
@@ -311,26 +311,40 @@ T SplayTree<T>::getRoot() {
  */
 template <typename T>
 std::vector<T> SplayTree<T>::inOrderWalk() const {
-    return inOrderElements;
+    return inorder(this->root);
 }
 
 template <typename T>
-void SplayTree<T>::inorder() {
-    if(root == nullptr) {
+std::vector<T> SplayTree<T>::inorder(Node* rootPtr) {
+    if(rootPtr == nullptr) {
         std::out_of_range("Tree is empty");
     }
 
-    inOrderElements = inoderRecursive(root);
+    std::vector<T> r, x;
+
+    if(rootPtr->leftChild != nullptr) {
+        x = inorder(rootPtr->leftChild);
+        r.insert(r.end(), x.begin(), x.end());
+    }
+
+    r.push_back(rootPtr->value);
+
+    if(root->rightChild != nullptr) {
+        x = inorder(rootPtr->rightChild);
+        r.insert(r.end(), x.begin(), x.end());
+    }
+
+    return r;
 }
 
-template <typename T>
-std::vector<T> SplayTree<T>::inorderRecursive(Node *rootPtr) {
-    std::vector<T> elements;
+// template <typename T>
+// std::vector<T> SplayTree<T>::inorderRecursive(Node *rootPtr) {
+//     std::vector<T> elements;
 
-    inorderRecursive(rootPtr->leftChild);
-    elements.insert(rootPtr->value);
-    inorderRecursive(rootPtr->rightChild);
+//     inorderRecursive(rootPtr->leftChild);
+//     elements.insert(rootPtr->value);
+//     inorderRecursive(rootPtr->rightChild);
 
-    return elements;
-}
+//     return elements;
+// }
 #endif
