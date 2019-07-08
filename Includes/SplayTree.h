@@ -114,222 +114,186 @@ private:
         }
     }
 
-    void insertRecursive(T element, Node *ptr);
-    void removeRecursive(T element, Node *ptr);
+    /**
+    * Recursive insert function that will go through
+    * the tree and insert a new value at the right place
+    * @param elemnt; The value to be inserted into the tree
+    * @param nodeTrv; Node pointer used to traverse the tree recursivly
+    * @return; void
+    */
+    void insertRecursive(T element, Node *ptr) {
+        if(root == nullptr) {
+            root = initNode(element);
+            numOfElements++;
+        } else if(nodeTrv->value > element) {
+            if(nodeTrv->leftChild != nullptr) {
+                insertRecursive(element, nodeTrv->leftChild);
+            } else {
+                nodeTrv->leftChild = initNode(element);
+                numOfElements++;
+            }
+        } else if(nodeTrv->value < element) {
+            if(nodeTrv->rightChild != nullptr) {
+                insertRecursive(element, nodeTrv->rightChild);
+            } else {
+                nodeTrv->rightChild = initNode(element);
+                numOfElements++;
+            }
+        }
+    }
+
+    void removeRecursive(T element, Node *ptr) {
+        Node* node;
+
+        if(ptr == nullptr) {
+            throw std::out_of_range("Tree seems to be empty!");
+        }
+
+        if(search(ptr, element) == nullptr) {
+            throw std::out_of_range("Value doesn't seem to exist! Can't remove item that doesn't exist!");
+        }
+
+        ptr = splay(ptr, element);
+
+        if(ptr->leftChild != nullptr) {
+            node = splay(ptr->leftChild, element);
+            node->rightChild = ptr->rightChild;
+        } else {
+            node = ptr->rightChild;
+        }
+
+        delete ptr;
+    }
+
+    void inOrderWalk(Node* rp) const {
+        std::vector<T> vec;
+
+        if(rp != nullptr) {
+            inOrderWalk(rp->leftChild);
+            vec.push_back(rp->value);
+            inOrderWalk(rp->rightChild);
+        }
+
+        this->inOrderElements = vec;
+    }
+
     // std::vector<T> inorderRecursive(Node *rootPtr) const;
-    void inOrderWalk(Node* rp) const;
 
 public:
-    SplayTree();
-    void insert(T element);     // Inserts an element [DONE]
-    void remove(T element);     // Removes an element
-    bool find(T element);       // Finds an element
-    size_t size();              // Returns number of elements [DONE]
-    T getMin();                 // Gets the minimum value in tree [DONE]
-    T getMax();                 // Gets the maximum value in the tree [DONE]
-    T getRoot();                // Gets the root node [DONE]
-    // std::vector<T> preOrderWalk() const;
-    std::vector<T> inOrderWalk() const;
-    // std::vector<T> postOrderWalk() const;
+    /**
+     * Class SplayTree constructor
+     */
+    SplayTree() {
+        this->root = nullptr;
+        numOfElements = 0;
+    }
+
+    /**
+     * Insert's a given element into the tree
+     * @param element; The value to be inserted into the tree
+     * @return; void
+     */
+    void insert(T element) {
+        insertRecursive(element, root);
+        root = splay(root, element);
+    }
+
+    /**
+    * Removes a given element from the tree
+    * @param element; The value to be removed from the tree
+    * @return; void
+    */
+    void remove(T element) {
+        removeRecursive(element, root);
+        root = splay(root, element);
+    }
+
+    /**
+    * Will look for a match to the passed parameter
+    * @param T element; template variable being the value that is looked for
+    * @return bool; returns true if the value have been found, otherwise false
+    */
+    bool find(T element) {
+        Node *nodePtr = root;
+        while(nodePtr != nullptr) {
+            if(nodePtr->value == element) {
+                return true;
+            } else if(element < nodePtr->value) {
+                nodePtr = nodePtr->leftChild;
+            } else if(element > nodePtr->value) {
+                nodePtr = nodePtr->rightChild;
+            } else {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    /**
+     *  Function that returns the num of elements in the tree
+     *  @param; none
+     *  @return size_t; number of elements in the tree
+     */
+    size_t size() {
+        return this->numOfElements;
+    }
+
+    /**
+    * Function that gets the smallest value in the tree
+    * @param; void
+    * @return; template variable
+    */
+    T getMin() {
+        Node *treeTrav = root;
+
+        while(treeTrav->leftChild != nullptr) {
+            treeTrav = treeTrav->leftChild;
+        }
+        // splay(treeTrav->value, treeTrav);
+
+        return treeTrav->value;
+    }
+
+    /**
+    * Function that gets the highest value in the tree
+    * @param; void
+    * @return; template variable
+    */
+    T getMax() {
+        Node *treeTrav = root;
+
+        while(treeTrav->rightChild != nullptr) {
+            treeTrav = treeTrav->rightChild;
+        }
+        // splay(treeTrav->value, treeTrav);
+
+        return treeTrav->value;
+    }
+
+    /**
+    * Function the returns the root node in the tree
+    * @param; void
+    * @return; template variable
+    */
+    T getRoot() {
+        return this->root->value;
+    }
+
+    /**
+     * Function inserting a tree´s values according to in-order principles
+     * @param; void
+     * @return std::vector<T>; returns a vector containing values according to in-order principles
+     */
+    std::vector<T> inOrderWalk() const {
+        if(root == nullptr) {
+            std::out_of_range("Tree is empty!");
+        } else {
+            inOrderWalk(root);
+        }
+
+        return this->inOrderElements;
+    }
 };
-
-/**
- *  Constructor for tree
- */
-template <typename T>
-SplayTree<T>::SplayTree() {
-    this->root = nullptr;
-    numOfElements = 0;
-}
-
-/**
- * Insert's a given element into the tree
- * @param element; The value to be inserted into the tree
- * @return; void
- */
-template <typename T>
-void SplayTree<T>::insert(T element) {
-    insertRecursive(element, root);
-    root = splay(root, element);
-}
-
-/**
- * Recursive insert function that will go through
- * the tree and insert a new value at the right place
- * @param elemnt; The value to be inserted into the tree
- * @param nodeTrv; Node pointer used to traverse the tree recursivly
- * @return; void
- */
-template <typename T>
-void SplayTree<T>::insertRecursive(T element, Node *nodeTrv) {
-    if(root == nullptr) {
-        root = initNode(element);
-        numOfElements++;
-    } else if(nodeTrv->value > element) {
-        if(nodeTrv->leftChild != nullptr) {
-            insertRecursive(element, nodeTrv->leftChild);
-        } else {
-            nodeTrv->leftChild = initNode(element);
-            numOfElements++;
-        }
-    } else if(nodeTrv->value < element) {
-        if(nodeTrv->rightChild != nullptr) {
-            insertRecursive(element, nodeTrv->rightChild);
-        } else {
-            nodeTrv->rightChild = initNode(element);
-            numOfElements++;
-        }
-    }
-}
-
-/**
- * Removes a given element from the tree
- * @param element; The value to be removed from the tree
- * @return; void
- */
-template <typename T>
-void SplayTree<T>::remove(T element) {
-    removeRecursive(element, root);
-    root = splay(root, element);
-}
-
-template <typename T>
-void SplayTree<T>::removeRecursive(T element, Node *ptr) {
-    Node* node;
-
-    if(ptr == nullptr) {
-        throw std::out_of_range("Tree seems to be empty!");
-    }
-
-    if(search(ptr, element) == nullptr) {
-        throw std::out_of_range("Value doesn't seem to exist! Can't remove item that doesn't exist!");
-    }
-
-    ptr = splay(ptr, element);
-
-    if(ptr->leftChild != nullptr) {
-        node = splay(ptr->leftChild, element);
-        node->rightChild = ptr->rightChild;
-    } else {
-        node = ptr->rightChild;
-    }
-
-    delete ptr;
-}
-
-/**
- * Will look for a match to the passed parameter
- * @param T element; template variable being the value that is looked for
- * @return bool; returns true if the value have been found, otherwise false
- */
-template <typename T>
-bool SplayTree<T>::find(T element) {
-    Node *nodePtr = root;
-    while(nodePtr != nullptr) {
-        if(nodePtr->value == element) {
-            return true;
-        } else if(element < nodePtr->value) {
-            nodePtr = nodePtr->leftChild;
-        } else if(element > nodePtr->value) {
-            nodePtr = nodePtr->rightChild;
-        } else {
-            return false;
-        }
-    }
-    return false;
-}
-
-/**
- *  Function that returns the num of elements in the tree
- *  @param; none
- *  @return size_t; number of elements in the tree
- */
-template <typename T>
-size_t SplayTree<T>::size() {
-    return numOfElements;
-}
-
-/**
- * Function that gets the smallest value in the tree
- * @param; void
- * @return; template variable
- */
-template <typename T>
-T SplayTree<T>::getMin() {
-    Node *treeTrav = root;
-
-    while(treeTrav->leftChild != nullptr) {
-        treeTrav = treeTrav->leftChild;
-    }
-    // splay(treeTrav->value, treeTrav);
-
-    return treeTrav->value;
-}
-
-/**
- * Function that gets the highest value in the tree
- * @param; void
- * @return; template variable
- */
-template <typename T>
-T SplayTree<T>::getMax() {
-    Node *treeTrav = root;
-
-    while(treeTrav->rightChild != nullptr) {
-        treeTrav = treeTrav->rightChild;
-    }
-    // splay(treeTrav->value, treeTrav);
-
-    return treeTrav->value;
-}
-
-/**
- * Function the returns the root node in the tree
- * @param; void
- * @return; template variable
- */
-template <typename T>
-T SplayTree<T>::getRoot() {
-    return root->value;
-}
-
-/**
- * Function inserting a tree´s values according to pre-order principles
- * @param; void
- * @return std::vector; returns a vector containing values according to pre-order principles
- */
-// template <typename T>
-// std::vector<T> SplayTree<T>::preOrderWalk() const {
-
-// }
-
-/**
- * Function inserting a tree´s values according to in-order principles
- * @param; void
- * @return std::vector<T>; returns a vector containing values according to in-order principles
- */
-template <typename T>
-std::vector<T> SplayTree<T>::inOrderWalk() const {
-    if(root == nullptr) {
-        std::out_of_range("Tree is empty!");
-    } else {
-        inOrderWalk(root);
-    }
-
-    return this->inOrderElements;
-}
-
-template <typename T>
-void SplayTree<T>::inOrderWalk(Node* rp) const {
-    std::vector<T> vec;
-    if(rp != nullptr) {
-        inOrderWalk(rp->leftChild);
-        vec.push_back(rp->value);
-        inOrderWalk(rp->rightChild);
-    }
-
-    this->inOrderElements = vec;
-}
 
 // template <typename T>
 // std::vector<T> SplayTree<T>::inorderRecursive(Node *rootPtr) const {
