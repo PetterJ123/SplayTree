@@ -7,7 +7,7 @@
 template <class T>
 class SplayTree {
 private:
-    class Node {
+    class Node {    // Nested class declaraing a node
     public:
         T value;
         Node *leftChild;
@@ -20,79 +20,79 @@ private:
         }
     };
 
+    Node *emptyNode;
     Node *root;
     size_t numOfElements;
     mutable std::vector<T> inOrderElements;
 
+    /**
+     * Function to initialize a new node on insert
+     * @param T element; The element the node shall contain
+     * @return Node*; The new node created
+     */
     Node* initNode(T element) {
         Node* node = new Node();
         node->value = element;
 
         return node;
     }
+    /**
+     * Function that is used to rotate the @param subRoot to the root node in the tree
+     * @param Node* subRoot; Pointer to the node that is rotated to the root node
+     * @param T element; template variable being each node's value
+     */
+    Node* splay(Node *subRoot, T element) {
+        Node* ltm;
+        Node* rtm;
+        static Node header;
 
-    Node* splay(Node *node, T element) {
-        Node N, *ltm, *rtm, *c;
-        if(node == nullptr) {
-            return nullptr;
-        }
+        header.leftChild = emptyNode;
+        header.rightChild = emptyNode;
 
-        N.leftChild = N.rightChild = nullptr;
-        ltm = rtm = &N;
+        emptyNode->value = element;
 
-        for(;;) {
-            if(node->value > element) {
+        while(true) {
+            if(subRoot->value > element) {
+                if(subRoot->leftChild->value > element) {
+                    Node* lsTree = subRoot->leftChild;
+                    subRoot->leftChild = lsTree->rightChild;
+                    lsTree->rightChild = subRoot;
+                    subRoot = lsTree;
+                }
 
-                if(node->leftChild == nullptr) {
+                if(subRoot->leftChild == nullptr) {
                     break;
                 }
 
-                if(node->leftChild->value > element) {
-                    c = node->leftChild;
-                    node->leftChild = c->rightChild;
-                    c->rightChild = node;
-                    node = c;
-
-                    if(node->leftChild == nullptr) {
-                        break;
-                    }
+                // Links right subtree with left tree
+                rtm->leftChild = subRoot;
+                rtm = subRoot;
+                subRoot = subRoot->leftChild;
+            } else if(subRoot->value < element) {
+                if(subRoot->rightChild->value < element) {
+                    Node* rsTree = subRoot->rightChild;
+                    subRoot->rightChild = rsTree->leftChild;
+                    rsTree->leftChild = subRoot;
+                    subRoot = rsTree;
                 }
-                rtm->leftChild = node;
-                rtm = node;
-                node = node->leftChild;
-            }
-            else if(node->value < element)
-            {
-                if(node->rightChild == nullptr) {
+
+                if(subRoot->rightChild == nullptr) {
                     break;
                 }
 
-                if(node->rightChild->value < element) {
-                    c = node->rightChild;
-                    node->rightChild = c->leftChild;
-                    c->leftChild = node;
-                    node = c;
-
-                    if(node->rightChild == nullptr) {
-                        break;
-                    }
-                }
-                ltm->rightChild = node;
-                ltm = node;
-                node = node->rightChild;
-            }
-            else
-            {
+                ltm->rightChild = subRoot;
+                ltm = subRoot;
+                subRoot = subRoot->rightChild;
+            } else {
                 break;
             }
         }
+        ltm->rightChild = subRoot->leftChild;
+        rtm->leftChild = subRoot->rightChild;
+        subRoot->leftChild = header.rightChild;
+        subRoot->rightChild = header.leftChild;
 
-        ltm->rightChild = node->leftChild;
-        rtm->leftChild = node->rightChild;
-        node->leftChild = N.rightChild;
-        node->rightChild = N.leftChild;
-
-        return node;
+        return subRoot;
     }
 
     /**
@@ -206,6 +206,15 @@ private:
     //     return r;
     // }
 
+    void clearTree(Node* trvptr) {
+        if(trvptr != nullptr) {
+            clearTree(trvptr->leftChild);
+            clearTree(trvptr->rightChild);
+            delete trvptr;
+        }
+        trvptr = nullptr;
+    }
+
 public:
     /**
      * Class SplayTree constructor
@@ -215,6 +224,10 @@ public:
         numOfElements = 0;
     }
 
+    ~SplayTree() {
+        clearTree(this->root);
+    }
+
     /**
      * Insert's a given element into the tree
      * @param element; The value to be inserted into the tree
@@ -222,7 +235,7 @@ public:
      */
     void insert(T element) {
         insertRecursive(element, root);
-        root = splay(root, element);
+        this->root = splay(this->root, element);
     }
 
     /**
