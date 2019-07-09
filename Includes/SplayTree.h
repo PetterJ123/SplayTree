@@ -18,75 +18,81 @@ private:
             leftChild = nullptr;
             rightChild = nullptr;
         }
+
+        Node(T value, Node* lc, Node* rc) {
+            this->value = value;
+            this->leftChild = lc;
+            this->rightChild = rc;
+        }
     };
 
-    Node *emptyNode;
     Node *root;
     size_t numOfElements;
+    mutable std::vector<T> preOrderElements;
     mutable std::vector<T> inOrderElements;
+    mutable std::vector<T> postOrderElements;
 
-    /**
-     * Function to initialize a new node on insert
-     * @param T element; The element the node shall contain
-     * @return Node*; The new node created
-     */
-    Node* initNode(T element) {
-        Node* node = new Node();
-        node->value = element;
-
-        return node;
-    }
     /**
      * Function that is used to rotate the @param subRoot to the root node in the tree
      * @param Node* subRoot; Pointer to the node that is rotated to the root node
      * @param T element; template variable being each node's value
      */
-    Node* splay(Node *subRoot, T element) {
-        Node* ltm;
-        Node* rtm;
-        static Node header;
+    Node* splay(Node* subRoot, T element) {
+        Node header, *ltm, *rtm, *current;
+        if(subRoot == nullptr) {
+            return nullptr;
+        }
 
-        header.leftChild = emptyNode;
-        header.rightChild = emptyNode;
+        header.leftChild = header.rightChild = nullptr;
+        ltm = rtm = &header;
 
-        emptyNode->value = element;
-
-        while(true) {
+        for(;;) {
             if(subRoot->value > element) {
-                if(subRoot->leftChild->value > element) {
-                    Node* lsTree = subRoot->leftChild;
-                    subRoot->leftChild = lsTree->rightChild;
-                    lsTree->rightChild = subRoot;
-                    subRoot = lsTree;
-                }
 
                 if(subRoot->leftChild == nullptr) {
                     break;
                 }
 
-                // Links right subtree with left tree
+                if(subRoot->leftChild->value > element) {
+                    current = subRoot->leftChild;
+                    subRoot->leftChild = current->rightChild;
+                    current->rightChild = subRoot;
+                    subRoot = current;
+
+                    if(subRoot->leftChild == nullptr) {
+                        break;
+                    }
+                }
                 rtm->leftChild = subRoot;
                 rtm = subRoot;
                 subRoot = subRoot->leftChild;
-            } else if(subRoot->value < element) {
-                if(subRoot->rightChild->value < element) {
-                    Node* rsTree = subRoot->rightChild;
-                    subRoot->rightChild = rsTree->leftChild;
-                    rsTree->leftChild = subRoot;
-                    subRoot = rsTree;
-                }
-
+            }
+            else if(subRoot->value < element)
+            {
                 if(subRoot->rightChild == nullptr) {
                     break;
                 }
 
+                if(subRoot->rightChild->value < element) {
+                    current = subRoot->rightChild;
+                    subRoot->rightChild = current->leftChild;
+                    current->leftChild = subRoot;
+                    subRoot = current;
+
+                    if(subRoot->rightChild == nullptr) {
+                        break;
+                    }
+                }
                 ltm->rightChild = subRoot;
                 ltm = subRoot;
                 subRoot = subRoot->rightChild;
-            } else {
+            }
+            else
+            {
                 break;
             }
         }
+
         ltm->rightChild = subRoot->leftChild;
         rtm->leftChild = subRoot->rightChild;
         subRoot->leftChild = header.rightChild;
@@ -117,26 +123,26 @@ private:
     /**
     * Recursive insert function that will go through
     * the tree and insert a new value at the right place
-    * @param elemnt; The value to be inserted into the tree
+    * @param element; The value to be inserted into the tree
     * @param nodeTrv; Node pointer used to traverse the tree recursivly
     * @return; void
     */
     void insertRecursive(T element, Node *nodeTrv) {
         if(root == nullptr) {
-            root = initNode(element);
+            root = new Node(element, nullptr, nullptr);
             numOfElements++;
         } else if(nodeTrv->value > element) {
             if(nodeTrv->leftChild != nullptr) {
                 insertRecursive(element, nodeTrv->leftChild);
             } else {
-                nodeTrv->leftChild = initNode(element);
+                nodeTrv->leftChild = new Node(element, nullptr, nullptr);
                 numOfElements++;
             }
         } else if(nodeTrv->value < element) {
             if(nodeTrv->rightChild != nullptr) {
                 insertRecursive(element, nodeTrv->rightChild);
             } else {
-                nodeTrv->rightChild = initNode(element);
+                nodeTrv->rightChild = new Node(element, nullptr, nullptr);
                 numOfElements++;
             }
         }
@@ -157,7 +163,7 @@ private:
         }
 
         if(search(ptr, element) == nullptr) {
-            throw std::out_of_range("Value doesn't seem to exist! Can't remove item that doesn't exist!");
+            return;
         }
 
         ptr = splay(ptr, element);
@@ -172,47 +178,37 @@ private:
         delete ptr;
     }
 
-    void inOrderWalk(Node* rp) const {
-        std::vector<T> vec;
-
+    void preOrder(Node* rp) const {
         if(rp != nullptr) {
-            inOrderWalk(rp->leftChild);
-            vec.push_back(rp->value);
-            inOrderWalk(rp->rightChild);
+            this->preOrderElements.push_back(rp->value);
+            preOrder(rp->leftChild);
+            preOrder(rp->rightChild);
         }
-
-        this->inOrderElements = vec;
     }
 
-    // std::vector<T> inorderRecursive(Node* ptr) {
-    //     if(rootPtr == nullptr) {
-    //         std::out_of_range("Tree is empty");
-    //     }
-
-    //     std::vector<T> r, x;
-
-    //     if(rootPtr->leftChild != nullptr) {
-    //         x = inorderRecursive(rootPtr->leftChild);
-    //         r.insert(r.end(), x.begin(), x.end());
-    //     }
-
-    //     r.push_back(rootPtr->value);
-
-    //     if(root->rightChild != nullptr) {
-    //         x = inorderRecursive(rootPtr->rightChild);
-    //         r.insert(r.end(), x.begin(), x.end());
-    //     }
-
-    //     return r;
-    // }
-
-    void clearTree(Node* trvptr) {
-        if(trvptr != nullptr) {
-            clearTree(trvptr->leftChild);
-            clearTree(trvptr->rightChild);
-            delete trvptr;
+    void inOrder(Node* rp) const {
+        if(rp != nullptr) {
+            inOrder(rp->leftChild);
+            this->inOrderElements.push_back(rp->value);
+            inOrder(rp->rightChild);
         }
-        trvptr = nullptr;
+    }
+
+    void postOrder(Node* rp) const {
+        if(rp != nullptr) {
+            postOrder(rp->leftChild);
+            postOrder(rp->rightChild);
+            this->postOrderElements.push_back(rp->value);
+        }
+    }
+
+    void clearTree(Node* root) {
+        if(root != nullptr) {
+            clearTree(root->leftChild);
+            clearTree(root->rightChild);
+            delete root;
+        }
+        root = nullptr;
     }
 
 public:
@@ -220,8 +216,11 @@ public:
      * Class SplayTree constructor
      */
     SplayTree() {
-        this->root = nullptr;
-        numOfElements = 0;
+        this->root = new Node();
+        this->root->leftChild = nullptr;
+        this->root->rightChild = nullptr;
+        this->root->value = -1;
+        this->numOfElements = 0;
     }
 
     ~SplayTree() {
@@ -245,7 +244,7 @@ public:
     */
     void remove(T element) {
         removeRecursive(element, root);
-        root = splay(root, element);
+        this->root = splay(this->root, element);
     }
 
     /**
@@ -257,6 +256,7 @@ public:
         Node *nodePtr = root;
         while(nodePtr != nullptr) {
             if(nodePtr->value == element) {
+                // nodePtr = splay(nodePtr, element);
                 return true;
             } else if(element < nodePtr->value) {
                 nodePtr = nodePtr->leftChild;
@@ -264,6 +264,7 @@ public:
                 nodePtr = nodePtr->rightChild;
             } else {
                 return false;
+                // nodePtr = splay(nodePtr, element);
             }
         }
         return false;
@@ -275,7 +276,7 @@ public:
      *  @return size_t; number of elements in the tree
      */
     size_t size() {
-        return this->numOfElements;
+        return numOfElements;
     }
 
     /**
@@ -284,14 +285,18 @@ public:
     * @return; template variable
     */
     T getMin() {
-        Node *treeTrav = root;
+        if(root == nullptr) {
+            throw std::underflow_error("Tree is empty");
+        } else {
+            Node *treeTrav = root;
 
-        while(treeTrav->leftChild != nullptr) {
-            treeTrav = treeTrav->leftChild;
+            while(treeTrav->leftChild != nullptr) {
+                treeTrav = treeTrav->leftChild;
+            }
+            treeTrav = splay(treeTrav, treeTrav->value);
+
+            return treeTrav->value;
         }
-        // splay(treeTrav->value, treeTrav);
-
-        return treeTrav->value;
     }
 
     /**
@@ -300,14 +305,18 @@ public:
     * @return; template variable
     */
     T getMax() {
-        Node *treeTrav = root;
+        if(root == nullptr) {
+            throw std::underflow_error("Tree is empty");
+        } else {
+            Node *treeTrav = root;
 
-        while(treeTrav->rightChild != nullptr) {
-            treeTrav = treeTrav->rightChild;
+            while(treeTrav->rightChild != nullptr) {
+                treeTrav = treeTrav->rightChild;
+            }
+            treeTrav = splay(treeTrav, treeTrav->value);
+
+            return treeTrav->value;
         }
-        // splay(treeTrav->value, treeTrav);
-
-        return treeTrav->value;
     }
 
     /**
@@ -316,22 +325,56 @@ public:
     * @return; template variable
     */
     T getRoot() {
-        return this->root->value;
+        if(root == nullptr) {
+            throw std::underflow_error("Tree is empty");
+        } else {
+            return this->root->value;
+        }
     }
 
     /**
-     * Function inserting a tree´s values according to in-order principles
+     * Function inserting a tree´s values into a vector
      * @param; void
-     * @return std::vector<T>; returns a vector containing values according to in-order principles
+     * @return std::vector<T>; a vector containing the tree´s values according to pre-order principles
+     */
+    std::vector<T> preOrderWalk() const {
+        if(root == nullptr) {
+            std::underflow_error("Tree is empty");
+        } else {
+            preOrder(root);
+        }
+
+        return this->preOrderElements;
+    }
+
+    /**
+     * Function inserting a tree´s values into a vector
+     * @param; void
+     * @return std::vector<T>; a vector containing the tree´s values according to in-order principles
      */
     std::vector<T> inOrderWalk() const {
         if(root == nullptr) {
-            std::out_of_range("Tree is empty!");
+            std::underflow_error("Tree is empty!");
         } else {
-            inOrderWalk(root);
+            inOrder(root);
         }
 
         return this->inOrderElements;
+    }
+
+    /**
+     * Function inserting a tree´s values into a vector
+     * @param; void
+     * @return std::vector<T>; a vector containing the tree´s values according to post-order principles
+     */
+    std::vector<T> postOrderWalk() const {
+        if(root == nullptr) {
+            throw std::underflow_error("Tree is empty");
+        } else {
+            postOrder(root);
+        }
+
+        return this->postOrderElements;
     }
 };
 
