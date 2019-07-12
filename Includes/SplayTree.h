@@ -14,7 +14,6 @@ private:
         Node *rightChild;
 
         Node() {
-            value = -1;
             leftChild = nullptr;
             rightChild = nullptr;
         }
@@ -48,7 +47,6 @@ private:
 
         for(;;) {
             if(subRoot->value > element) {
-
                 if(subRoot->leftChild == nullptr) {
                     break;
                 }
@@ -199,6 +197,7 @@ private:
             postOrder(rp->leftChild);
             postOrder(rp->rightChild);
             this->postOrderElements.push_back(rp->value);
+
         }
     }
 
@@ -209,6 +208,9 @@ private:
             delete root;
         }
         root = nullptr;
+        this->preOrderElements.clear();
+        this->inOrderElements.clear();
+        this->postOrderElements.clear();
     }
 
 public:
@@ -219,8 +221,11 @@ public:
         this->root = new Node();
         this->root->leftChild = nullptr;
         this->root->rightChild = nullptr;
-        this->root->value = -1;
         this->numOfElements = 0;
+
+        this->preOrderElements.clear();
+        this->inOrderElements.clear();
+        this->postOrderElements.clear();
     }
 
     ~SplayTree() {
@@ -256,7 +261,7 @@ public:
         Node *nodePtr = root;
         while(nodePtr != nullptr) {
             if(nodePtr->value == element) {
-                // nodePtr = splay(nodePtr, element);
+                nodePtr = splay(nodePtr, element);
                 return true;
             } else if(element < nodePtr->value) {
                 nodePtr = nodePtr->leftChild;
@@ -264,7 +269,6 @@ public:
                 nodePtr = nodePtr->rightChild;
             } else {
                 return false;
-                // nodePtr = splay(nodePtr, element);
             }
         }
         return false;
@@ -328,7 +332,7 @@ public:
         if(root == nullptr) {
             throw std::underflow_error("Tree is empty");
         } else {
-            return this->root->value;
+            return root->value;
         }
     }
 
